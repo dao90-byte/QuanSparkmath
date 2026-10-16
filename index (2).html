@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Toán Vui Cùng Khỉ Con</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:'Baloo 2','Nunito','Comic Sans MS',system-ui,sans-serif;background:linear-gradient(#b9ecf2,#fff1b8);min-height:100vh;color:#3b2f63;user-select:none;-webkit-user-select:none}
+#app{max-width:720px;margin:auto;padding:12px;text-align:center}
+.btn{border:0;border-radius:22px;padding:10px 18px;font:inherit;font-size:22px;font-weight:800;color:#fff;background:#ff7043;box-shadow:0 5px 0 rgba(0,0,0,.2);cursor:pointer;margin:4px}
+.btn:active{transform:translateY(4px);box-shadow:none}
+.btn:focus-visible,.card:focus-visible{outline:4px solid #3b2f63}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.card{border-radius:26px;padding:14px;color:#fff;font-size:24px;font-weight:800;box-shadow:0 6px 0 rgba(0,0,0,.18);cursor:pointer}
+.card b{font-size:50px;display:block;line-height:1.2}
+.bar{height:20px;background:#fff;border-radius:10px;overflow:hidden;margin:8px 0}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#ffca28,#ff7043);transition:width .6s}
+.mk{animation:bn 1.6s ease-in-out infinite}
+@keyframes bn{50%{transform:translateY(-8px) rotate(-3deg)}}
+.sh{animation:sh .4s}
+@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.ov{position:fixed;inset:0;background:rgba(40,30,80,.6);display:flex;align-items:center;justify-content:center;z-index:50}
+.ov>div{background:#fff;border-radius:30px;padding:22px;max-width:92%;text-align:center}
+.cf{position:fixed;top:-50px;animation:fall 2.4s linear forwards;z-index:99;pointer-events:none;font-style:normal}
+@keyframes fall{to{transform:translateY(115vh) rotate(360deg)}}
+.row{display:flex;align-items:center;justify-content:space-between}
+.say{font-size:22px;font-weight:800;margin:8px 4px}
+.bg{display:inline-block;width:30%;margin:5px;font-size:16px;font-weight:800}
+.bg b{display:block;font-size:52px}
+.lock{filter:grayscale(1);opacity:.4}
+@media(prefers-reduced-motion:reduce){.mk,.sh{animation:none}}
+</style></head><body><div id="app"></div>
+<script>
+const app=document.getElementById('app'),rand=n=>Math.floor(Math.random()*n),shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+let S;try{S=JSON.parse(localStorage.sm1)}catch(e){}
+S=S||{st:{},bd:[]};S.ch=S.ch||{};
+const save=()=>{try{localStorage.sm1=JSON.stringify(S)}catch(e){}};
+const view=h=>{app.innerHTML=h;window.scrollTo(0,0)};
+/* ===== Âm thanh & giọng đọc ===== */
+let mute=false,AC,V,IN='';
+function tone(seq){if(mute)return;try{AC=AC||new(window.AudioContext||webkitAudioContext)();let t=AC.currentTime;seq.forEach(([f,d,ty])=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ty||'triangle';o.frequency.value=f;g.gain.setValueAtTime(.2,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d);t+=d*.8})}catch(e){}}
+const SND={ok:[[660,.12],[880,.2]],no:[[260,.2,'square'],[200,.3,'square']],pop:[[520,.07]],win:[[523,.15],[659,.15],[784,.15],[1047,.45]]};
+const snd=k=>tone(SND[k]);
+function pick(){const v=speechSynthesis.getVoices().filter(x=>/^vi/i.test(x.lang));V=v.find(x=>/HoaiMy|Linh|Female|Google/i.test(x.name))||v[0]}
+if('speechSynthesis'in window){pick();speechSynthesis.onvoiceschanged=pick}
+function say(t){if(mute||!('speechSynthesis'in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='vi-VN';if(V)u.voice=V;u.pitch=1.4;u.rate=.85;speechSynthesis.speak(u)}
+const speak=t=>{IN=t;say(t)};
+function confetti(){for(let i=0;i<32;i++){const e=document.createElement('i');e.textContent=['⭐','🎉','🎈','✨','🍬'][i%5];e.className='cf';e.style.cssText=`left:${Math.random()*100}vw;animation-delay:${Math.random()*.7}s;font-size:${20+Math.random()*22}px`;document.body.appendChild(e);setTimeout(()=>e.remove(),3300)}}
+/* ===== Dữ liệu chung ===== */
+const MK=w=>`<svg class="mk" width="${w}" viewBox="0 0 100 100" aria-hidden="true"><circle cx="18" cy="42" r="14" fill="#e8344e"/><circle cx="82" cy="42" r="14" fill="#e8344e"/><circle cx="18" cy="42" r="8" fill="#ffd9d0"/><circle cx="82" cy="42" r="8" fill="#ffd9d0"/><circle cx="50" cy="52" r="36" fill="#e8344e"/><ellipse cx="50" cy="62" rx="26" ry="20" fill="#ffe4dc"/><circle cx="38" cy="46" r="6" fill="#3b1a1a"/><circle cx="62" cy="46" r="6" fill="#3b1a1a"/><circle cx="40" cy="44" r="2" fill="#fff"/><circle cx="64" cy="44" r="2" fill="#fff"/><ellipse cx="50" cy="58" rx="5" ry="3.5" fill="#6b2a2a"/><path d="M36 68q14 14 28 0z" fill="#b3202f"/><path d="M42 18q-4-14 6-14M58 18q4-14-6-14" stroke="#3b1a1a" stroke-width="3" fill="none"/></svg>`;
+const G=[{id:'ang',n:'Góc vuông',ic:'📐',L:5,c:'#ff8a65'},{id:'t',n:'Xếp hình T',ic:'🧩',L:6,c:'#26b5c9'},{id:'t2',n:'T nâng cao',ic:'🧱',L:10,c:'#3f7fd6'},{id:'tan',n:'Tangram',ic:'🔷',L:5,c:'#ab5fc2'},{id:'tan2',n:'Tangram nâng cao',ic:'🦊',L:12,c:'#e0589a'},{id:'sdk',n:'Sudoku 4x4',ic:'🍎',L:15,c:'#5aae5e'}];
+const gs=g=>S.st[g.id]||[],sum=g=>gs(g).reduce((a,b)=>a+(b||0),0),tot=()=>G.reduce((a,g)=>a+sum(g),0)+Object.keys(S.ch).length,done=()=>G.reduce((a,g)=>a+gs(g).filter(x=>x>0).length,0),MAXL=G.reduce((a,g)=>a+g.L,0);
+const RK=[[0,'Khỉ con tập sự 🐵'],[15,'Thám hiểm nhí 🧭'],[50,'Nhà toán học nhí 🎓'],[100,'Siêu nhân toán 🦸']];
+const rank_=()=>[...RK].reverse().find(r=>tot()>=r[0])[1];
+const BD=[['b1','🌱','Bước đầu tiên',()=>done()>=1],['b2','⭐','10 ngôi sao',()=>tot()>=10],['b3','🏆','30 ngôi sao',()=>tot()>=30],['b4','💎','Ba sao tuyệt đối',()=>G.some(g=>gs(g).filter(x=>x==3).length>=3)],...G.map(g=>['c'+g.id,g.ic,'Giỏi '+g.n,()=>gs(g).filter(x=>x>0).length>=g.L]),['bh','🚀','100 ngôi sao',()=>tot()>=100],['bx','🌈','Thử thách ngoài đời',()=>Object.keys(S.ch).length>=4],['b9','👑','Vua toán học',()=>done()>=MAXL]];
+let cur={};
+/* ===== Màn hình chính ===== */
+function splash(){view(`<div style="margin-top:8vh">${MK(190)}<h1 style="font-size:40px;margin:6px">Toán Vui Cùng Khỉ Con</h1><button class="btn" style="font-size:36px;padding:16px 40px;background:#43a047" onclick="home(1)">▶️ Chơi nào!</button></div>`)}
+function home(hi){const T=tot(),D=done();
+view(`<div class="row" style="justify-content:center;gap:10px">${MK(84)}<div style="text-align:left"><div style="font-size:26px;font-weight:800">Toán Vui Cùng Khỉ Con</div><div>${rank_()}</div><div style="font-size:26px">⭐ ${T}</div></div></div>
+<div class="bar"><i style="width:${D/MAXL*100}%"></i></div><p class="say">Em đã xong ${D} / ${MAXL} bài</p>
+<div class="grid">${G.map((g,i)=>`<div class="card" tabindex="0" style="background:${g.c}" onclick="lv(${i})"><b>${g.ic}</b>${g.n}<div>${gs(g).filter(x=>x>0).length}/${g.L} bài ⭐${sum(g)}</div></div>`).join('')}</div>
+<p><button class="btn" onclick="bdg()">🏅 Huy hiệu</button><button class="btn" style="background:#7e57c2" onclick="rank()">🏆 Thành tích</button><button class="btn" style="background:#26a69a" aria-label="Bật tắt âm thanh" onclick="mute=!mute;if(mute)speechSynthesis.cancel();home()">${mute?'🔇':'🔊'}</button></p>`);
+if(hi)say('Xin chào! Mình là Khỉ Con. Chúng mình cùng chơi toán nhé! Em chọn một trò chơi đi.')}
+function lv(i){const g=G[i];view(`<div class="row"><button class="btn" style="background:#78909c" onclick="home()">⬅️</button><b style="font-size:28px">${g.ic} ${g.n}</b><span style="width:70px"></span></div>
+<div style="font-size:90px">${MK(110)}</div><p class="say">Chọn một bài nhé!</p>
+<div class="grid" style="grid-template-columns:repeat(3,1fr)">${Array.from({length:g.L},(_,k)=>{const lk=k>0&&!gs(g)[k-1],s=gs(g)[k]||0;return `<button class="btn ${lk?'lock':''}" style="background:${g.c};font-size:32px" ${lk?'disabled':''} onclick="play(${i},${k})">${lk?'🔒':k+1}<div style="font-size:18px">${'⭐'.repeat(s)+'☆'.repeat(3-s)}</div></button>`}).join('')}</div><p><button class="btn" style="background:#8d6e63" onclick="chl(${i})">🏠 Thử thách ${S.ch['c'+g.id]?'✅':''}</button><button class="btn" style="background:#5c6bc0" onclick="ev(${i})">📝 Đánh giá ${S.ch['e'+g.id]?'✅':''}</button></p>`);say('Chọn một bài nhé!')}
+function bdg(){view(`<div class="row"><button class="btn" style="background:#78909c" onclick="home()">⬅️</button><b style="font-size:28px">🏅 Huy hiệu của em</b><span style="width:70px"></span></div><p class="say">Em có ${S.bd.length} / ${BD.length} huy hiệu</p>${BD.map(b=>`<div class="bg ${S.bd.includes(b[0])?'':'lock'}" onclick="say('${S.bd.includes(b[0])?b[2]:'Chơi tiếp để nhận huy hiệu này nhé'}')"><b>${b[1]}</b>${b[2]}</div>`).join('')}`)}
+function rank(){const L=[...G].sort((a,b)=>sum(b)-sum(a)),M=['🥇','🥈','🥉','🎖️','🎖️','🎖️'];
+view(`<div class="row"><button class="btn" style="background:#78909c" onclick="home()">⬅️</button><b style="font-size:28px">🏆 Thành tích</b><span style="width:70px"></span></div>${MK(100)}<p class="say" style="font-size:26px">${rank_()}<br>⭐ ${tot()} sao</p>
+${L.map((g,i)=>`<div class="card" style="background:${g.c};margin:10px 0;display:flex;justify-content:space-between"><span>${M[i]} ${g.ic} ${g.n}</span><span>⭐ ${sum(g)}/${g.L*3}</span></div>`).join('')}`);say('Em đã được '+tot()+' sao. Cố lên nhé!')}
+/* ===== Khung bài chơi ===== */
+const hdr=t=>`<div class="row"><button class="btn" style="background:#78909c" aria-label="Quay lại" onclick="lv(${cur.i})">⬅️</button><b style="font-size:26px">${cur.g.ic} Bài ${cur.li+1}</b><button class="btn" style="background:#26a69a" aria-label="Nghe lại" onclick="say(IN)">🔊</button></div><p class="say">${t}</p>`;
+const star=m=>m==0?3:m<3?2:1;
+function play(i,li){cur={g:G[i],i,li,mis:0,lock:0};({ang:qA,t:pz,t2:pz,tan:pz,tan2:pz,sdk:sd})[cur.g.id]()}
+function dn(s){const g=cur.g,o=gs(g).slice();while(o.length<g.L)o.push(0);o[cur.li]=Math.max(o[cur.li]||0,s);S.st[g.id]=o;
+const nb=BD.filter(b=>!S.bd.includes(b[0])&&b[3]());nb.forEach(b=>S.bd.push(b[0]));save();snd('win');confetti();
+say('Giỏi quá! Em được '+s+' sao.'+(nb.length?' Chúc mừng em nhận huy hiệu '+nb[0][2]+'!':''));
+const nx=cur.li+1<g.L;
+const d=document.createElement('div');d.className='ov';d.innerHTML=`<div>${MK(110)}<div style="font-size:54px">${'⭐'.repeat(s)+'☆'.repeat(3-s)}</div><div class="say" style="font-size:28px">Giỏi quá!</div>${nb.map(b=>`<div style="font-size:22px">${b[1]} Huy hiệu mới: ${b[2]}</div>`).join('')}${nx?`<button class="btn" style="background:#43a047" onclick="this.closest('.ov').remove();play(${cur.i},${cur.li+1})">Bài tiếp ➡️</button>`:''}<button class="btn" onclick="this.closest('.ov').remove();play(${cur.i},${cur.li})">🔄</button><button class="btn" style="background:#78909c" onclick="this.closest('.ov').remove();lv(${cur.i})">🏠</button></div>`;document.body.appendChild(d)}
+/* ===== Trò chơi 1: Góc vuông (đếm bằng tích vô hướng, luôn chính xác) ===== */
+const SH=[[[0,0],[3,0],[3,3],[0,3]],[[0,0],[4,0],[4,2],[0,2]],[[0,0],[4,0],[0,3]],[[0,3],[4,3],[2,0]],[[2,0],[4,1.5],[2,3],[0,1.5]],[[0,0],[2,0],[4,3],[0,3]],[[0,3],[0,1],[2,0],[4,1],[4,3]],[[0,0],[1,0],[1,1],[0,1]].map(([x,y])=>[x*3,y*3])];
+const raV=p=>p.map((q,i)=>i).filter(i=>{const q=p[i],a=p[(i+p.length-1)%p.length],b=p[(i+1)%p.length],u=[a[0]-q[0],a[1]-q[1]],v=[b[0]-q[0],b[1]-q[1]];return Math.abs(u[0]*v[0]+u[1]*v[1])<1e-6*Math.hypot(...u)*Math.hypot(...v)});
+function qA(){const pool=SH.slice(0,4+cur.li),P=pool[rand(pool.length)],a=Math.random()*6.28,c=Math.cos(a),s=Math.sin(a),p=P.map(([x,y])=>[x*c-y*s,x*s+y*c]);cur.v=raV(p).map(i=>p[i]);cur.lock=0;cur.q=cur.q||0;
+const xs=p.map(q=>q[0]),ys=p.map(q=>q[1]),x0=Math.min(...xs)-.7,y0=Math.min(...ys)-.7,w=Math.max(...xs)-x0+.7,h=Math.max(...ys)-y0+.7;
+view(hdr('Hình này có mấy góc vuông? Chọn số đúng nhé!<br><small>📐 Góc vuông giống góc của quyển vở</small>')+`<svg id="sv" viewBox="${x0} ${y0} ${w} ${h}" style="width:100%;max-width:340px;height:260px;background:#fff;border-radius:22px"><polygon points="${p.join(' ')}" fill="#ffb74d" stroke="#ef6c00" stroke-width=".12" stroke-linejoin="round"/></svg><div>${[0,1,2,3,4].map(k=>`<button class="btn" style="font-size:36px;width:62px;margin:6px" onclick="ansA(${k},this)">${k}</button>`).join('')}</div><p>Câu ${cur.q+1} / 2</p>`);
+speak('Hình này có mấy góc vuông? Hãy chọn số đúng nhé!')}
+function ansA(k,b){if(cur.lock)return;if(k!=cur.v.length){cur.mis++;snd('no');b.classList.add('sh');say('Chưa đúng, em đếm lại nhé!');return}
+cur.lock=1;snd('ok');say('Đúng rồi! Có '+k+' góc vuông.');document.getElementById('sv').insertAdjacentHTML('beforeend',cur.v.map(q=>`<circle cx="${q[0]}" cy="${q[1]}" r=".3" fill="#e53935" opacity=".85"/>`).join(''));
+cur.q++;setTimeout(()=>{if(cur.q>=2){cur.q=0;dn(star(cur.mis))}else qA()},1900)}
+/* ===== Trò chơi 2 & 3: Xếp hình T và Tangram (kéo thả, chạm để xoay) ===== */
+const fm=m=>[...new Set(m.join('').replace(/\./g,''))].map(ch=>{const ed={},k=(x,y)=>x+','+y,h=(a,b)=>m[b]&&m[b][a]==ch;m.forEach((r,y)=>[...r].forEach((c,x)=>{if(c!=ch)return;if(!h(x,y-1))ed[k(x,y)]=[x+1,y];if(!h(x+1,y))ed[k(x+1,y)]=[x+1,y+1];if(!h(x,y+1))ed[k(x+1,y+1)]=[x,y+1];if(!h(x-1,y))ed[k(x,y+1)]=[x,y]}));const s=Object.keys(ed)[0].split(',').map(Number),o=[];let p=s;do{o.push(p);p=ed[k(...p)]}while(p[0]!=s[0]||p[1]!=s[1]);return o});
+const tri=(x,y,a,t)=>({tl:[[0,0],[a,0],[0,a]],tr:[[a,0],[a,a],[0,0]],br:[[a,a],[0,a],[a,0]],bl:[[0,a],[0,0],[a,a]]}[t].map(([p,q])=>[p+x,q+y])),rc=(x,y,w,h)=>[[x,y],[x+w,y],[x+w,y+h],[x,y+h]];
+const PZ={t:[["AAB","ABB"],["AAB",".A.",".C."],["AAA","BCC","BBC"],["A..","AB.","ABC"],["AABCC","..B..","..B.."],["AABB","ACCB"]].map(fm),
+t2:[["AABB","ACCB","DCCB"],["A.B","CCC","D.E"],["A..","A..","BBB","C.D"],["..A..",".BAC.","BBACC"],["AAAB","CCAB","CDDB","CDDB"],[".AABB","CCAD."],["..A..","..A..","BEEEC","..D..","..D.."],["..A..",".AAB.","CCDBB","..D..","..D.."],["AAAB","DEEB","DEEB","DCCC"],["AABBB","ACCBD","ACDDD"]].map(fm),
+tan:[[tri(0,0,2,'tl'),tri(0,0,2,'br')],[tri(0,0,1,'tl'),tri(1,0,1,'tl'),tri(0,1,1,'tl'),tri(0,0,1,'br')],[tri(0,0,1,'br'),rc(1,0,1,1),tri(2,0,1,'bl')],[tri(0,0,1,'br'),rc(1,0,1,1),tri(2,0,1,'tl')],[tri(0,0,2,'bl'),tri(0,0,2,'tr'),rc(2,0,1,1),rc(2,1,1,1)]],
+tan2:[[[[0,1],[2,1],[1,0]],tri(0,1,2,'tl'),tri(0,1,2,'br')],[tri(0,0,2,'br'),tri(2,0,2,'bl'),rc(1,2,2,2)],[tri(0,0,2,'br'),tri(0,2,1,'tr'),rc(1,2,2,1),tri(3,2,1,'tl')],[tri(0,0,2,'tl'),tri(2,0,2,'tl'),tri(0,2,2,'tl'),tri(0,0,2,'br')],[tri(0,0,2,'br'),tri(2,0,2,'bl'),tri(0,2,2,'tr'),tri(2,2,2,'tl')],[tri(0,0,2,'br'),tri(2,0,2,'bl'),tri(4,1,1,'br'),tri(5,1,1,'bl')],[tri(1,0,2,'tl'),tri(1,0,2,'br'),tri(0,0,1,'tr'),tri(0,1,1,'br')],[[[1,1],[2,0],[3,1]],rc(1,1,2,3),tri(0,3,1,'br'),tri(3,3,1,'bl'),[[1,4],[3,4],[2,5]]],[tri(0,0,1,'br'),rc(1,0,2,1),tri(3,0,1,'bl'),rc(0,1,4,1),rc(0,2,1,1),rc(3,2,1,1)],[rc(1,1,2,2),tri(1,0,1,'bl'),tri(2,0,1,'br'),rc(1,3,2,2),tri(3,4,1,'tl')],[[[1,0],[3,0],[2,1],[0,1]],tri(0,0,1,'tl'),tri(2,0,1,'br')],[[[1,0],[3,0],[2,1],[0,1]],tri(0,0,1,'tl'),tri(2,0,1,'br'),[[0,1],[2,1],[3,2],[1,2]],tri(0,1,1,'bl'),tri(2,1,1,'tr')]]};
+const NM={t:['hình chữ nhật','chữ T','hình vuông','cầu thang','chữ T lớn','hình chữ nhật dài'],t2:['hình chữ nhật','chữ H','cái ghế','ngọn tháp','hình vuông lớn','chữ S','dấu cộng','mũi tên','chong chóng','chữ nhật 5x3'],tan:['hình vuông','hình tam giác','hình thang','hình bình hành','hình chữ nhật'],tan2:['ngôi nhà','cây thông','con thuyền','tam giác lớn','hình thoi','dãy núi','con cá','tên lửa','chiếc xe','con mèo','hình chữ nhật dài','hình chữ nhật đôi']},COL=['#ff7043','#29b6f6','#fbc02d','#66bb6a','#ab47bc','#ec407a'],W=10,H=15;
+const nm0=q=>{const a=Math.min(...q.map(p=>p[0])),b=Math.min(...q.map(p=>p[1]));return q.map(([x,y])=>[x-a,y-b])},rot=q=>nm0(q.map(([x,y])=>[-y,x]));
+const pip=([x,y],q)=>{let r=false;for(let i=0,j=q.length-1;i<q.length;j=i++){const[a,b]=q[i],[c,d]=q[j];if((b>y)!=(d>y)&&x<(c-a)*(y-b)/(d-b)+a)r=!r}return r};
+const abs=o=>o.p.map(([x,y])=>[x+o.x,y+o.y]),ptsOf=o=>abs(o).join(' ');
+function chk(){const all=cur.P.map(abs);for(let X=0;X<W;X++)for(let Y=0;Y<H;Y++)for(const a of[.23,.61])for(const b of[.37,.71]){const pt=[X+a,Y+b],c=all.filter(q=>pip(pt,q)).length,t=cur.tg.some(q=>pip(pt,q));if(t?c!=1:c)return false}return true}
+function pz(){const D=PZ[cur.g.id][cur.li],nm=NM[cur.g.id][cur.li],tx=Math.floor((W-Math.max(...D.flat().map(p=>p[0])))/2);cur.tg=D.map(p=>p.map(([x,y])=>[x+tx,y]));cur.mv=0;cur.lock=0;cur.s=null;cur.fl=/2$/.test(cur.g.id);let cx=0,cy=6,rh=0;
+cur.P=D.map((p,i)=>{let q=nm0(p);if(cur.fl&&Math.random()<.5)q=nm0(q.map(([x,y])=>[-x,y]));for(let k=rand(4);k>0;k--)q=rot(q);const w=Math.max(...q.map(a=>a[0])),h=Math.max(...q.map(a=>a[1]));if(cx+w>W){cx=0;cy+=rh+1;rh=0}rh=Math.max(rh,h);const o={p:q,x:cx,y:cy,c:COL[i%6]};cx+=w+1;return o});
+view(hdr('Kéo các mảnh ghép để xếp thành '+nm+'. Chạm vào mảnh để xoay.'+(cur.fl?' Bấm nút Lật để lật mảnh.':''))+`<div style="position:relative;max-width:520px;margin:auto"><svg id="sv" viewBox="0 0 ${W} ${H}" style="width:100%;display:block;touch-action:none;background:#fff;border-radius:22px">${cur.tg.map(q=>`<polygon points="${q.join(' ')}" fill="#cfd8dc" ${cur.fl?'stroke="#cfd8dc" stroke-width=".05" stroke-linejoin="round"':'stroke="#78909c" stroke-width=".06" stroke-dasharray=".2 .15"'}/>`).join('')}${cur.fl?'':`<line x1="0" x2="${W}" y1="5.7" y2="5.7" stroke="#cfd8dc" stroke-width=".05"/>`}${cur.P.map((o,i)=>`<polygon data-i="${i}" points="${ptsOf(o)}" fill="${o.c}" stroke="#fff" stroke-width=".07" stroke-linejoin="round" style="cursor:grab"/>`).join('')}</svg>${cur.fl?'<button class="btn" aria-label="Lật mảnh ghép" style="position:absolute;top:6px;right:6px;margin:0;background:#7e57c2;font-size:18px;padding:6px 10px" onclick="cur.flip()">↔️ Lật</button>':''}</div>`);
+speak('Kéo các mảnh ghép vào hình màu xám cho vừa khít nhé. Chạm vào mảnh ghép để xoay.'+(cur.fl?' Bấm nút lật để lật mảnh ghép.':''));
+const sv=document.getElementById('sv'),xy=e=>{const p=sv.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const r=p.matrixTransform(sv.getScreenCTM().inverse());return[r.x,r.y]};let d=null;
+sv.onpointerdown=e=>{const el=e.target.closest('polygon[data-i]');if(!el||cur.lock)return;sv.appendChild(el);cur.s=+el.dataset.i;hl();const o=cur.P[el.dataset.i],[px,py]=xy(e);d={o,el,px,py,x:o.x,y:o.y,m:0};sv.setPointerCapture(e.pointerId)};
+sv.onpointermove=e=>{if(!d)return;const[px,py]=xy(e),dx=px-d.px,dy=py-d.py;if(Math.abs(dx)+Math.abs(dy)>.25)d.m=1;if(d.m){d.o.x=d.x+dx;d.o.y=d.y+dy;d.el.setAttribute('points',ptsOf(d.o))}};
+sv.onpointerup=()=>{if(!d)return;const o=d.o;if(!d.m){o.x=d.x;o.y=d.y;o.p=rot(o.p)}
+const w=Math.max(...o.p.map(a=>a[0])),h=Math.max(...o.p.map(a=>a[1]));o.x=Math.min(Math.max(Math.round(o.x),0),W-w);o.y=Math.min(Math.max(Math.round(o.y),0),H-h);d.el.setAttribute('points',ptsOf(o));d=null;cur.mv++;snd('pop');
+wn()}
+const hl=()=>sv.querySelectorAll('polygon[data-i]').forEach(e=>{const on=e.dataset.i==cur.s;e.setAttribute('stroke',on?'#3b2f63':'#fff');e.setAttribute('stroke-width',on?.12:.07)}),wn=()=>{if(chk()){cur.lock=1;setTimeout(()=>{const n=cur.P.length,m=cur.fl?1.5:1;dn(cur.mv<=n*6*m?3:cur.mv<=n*10*m?2:1)},500)}};
+cur.flip=()=>{if(cur.s==null||cur.lock){say('Chạm vào một mảnh ghép trước nhé!');return}const o=cur.P[cur.s];o.p=nm0(o.p.map(([x,y])=>[-x,y]));sv.querySelector('polygon[data-i="'+cur.s+'"]').setAttribute('points',ptsOf(o));cur.mv++;snd('pop');wn()}}
+/* ===== Trò chơi 4: Sudoku 4x4 (lời giải duy nhất, được kiểm tra bằng bộ giải) ===== */
+const E=()=>cur.li<2?['','🍎','🍌','🍇','🍓']:['','1','2','3','4'],SI=()=>cur.li<2?'Điền các hình còn thiếu. Mỗi hàng, cột và ô vuông nhỏ có đủ 4 hình khác nhau.':'Điền các số còn thiếu. Mỗi hàng, cột và ô vuông nhỏ có đủ các số từ 1 đến 4.'+(cur.dg?' Hai đường chéo viền tím cũng phải có đủ 4 số khác nhau.':''),DG=i=>cur.dg&&((i>>2)==(i&3)||(i>>2)+(i&3)==3);
+function okS(b,i,v){const r=i>>2,c=i&3;for(let k=0;k<4;k++)if(b[r*4+k]==v||b[k*4+c]==v)return false;if(cur.dg){if(r==c)for(let k=0;k<4;k++)if(b[k*5]==v)return false;if(r+c==3)for(let k=0;k<4;k++)if(b[3+k*3]==v)return false}const R=r&2,C=c&2;for(let a=0;a<2;a++)for(let d=0;d<2;d++)if(b[(R+a)*4+C+d]==v)return false;return true}
+function cnt(b,lim){const i=b.indexOf(0);if(i<0)return 1;let n=0;for(let v=1;v<5&&n<lim;v++)if(okS(b,i,v)){b[i]=v;n+=cnt(b,lim-n);b[i]=0}return n}
+function fill(b){const i=b.indexOf(0);if(i<0)return true;for(const v of shuf([1,2,3,4]))if(okS(b,i,v)){b[i]=v;if(fill(b))return true;b[i]=0}return false}
+function sd(){cur.dg=cur.li>=10;const s=Array(16).fill(0);fill(s);const p=s.slice(),K=[4,5,6,7,8,9,9,10,10,11,8,9,10,10,11][cur.li];let r=0;for(const i of shuf([...Array(16).keys()])){if(r>=K)break;const t=p[i];p[i]=0;if(cnt(p.slice(),2)==1)r++;else p[i]=t}
+cur.sol=s;cur.p=p;cur.fx=p.map(v=>v>0);cur.sel=1;cur.lock=0;rsd();speak(SI())}
+function rsd(){view(hdr(SI())+`<div style="display:inline-grid;grid-template-columns:repeat(4,min(21vw,86px));background:#fff;border:4px solid #3b2f63;border-radius:12px;overflow:hidden">${cur.p.map((v,i)=>`<div id="c${i}" onclick="pk(${i})" style="aspect-ratio:1;font-size:min(11vw,46px);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px #b0bec5;${(i&3)==1?'border-right:4px solid #3b2f63;':''}${(i>>2)==1?'border-bottom:4px solid #3b2f63;':''}${DG(i)?'outline:3px solid #7e57c2;outline-offset:-3px;':''}background:${v?(cur.fx[i]?'#ffe9a8':'#d8f5dc'):'#fff'}">${E()[v]}</div>`).join('')}</div><p class="say">Chọn hình rồi chạm vào ô trống:</p><div>${[1,2,3,4].map(k=>`<button class="btn" style="font-size:40px;background:${cur.sel==k?'#43a047':'#b0bec5'}" onclick="cur.sel=${k};snd('pop');rsd()">${E()[k]}</button>`).join('')}</div>`)}
+function pk(i){if(cur.p[i]||cur.lock)return;if(cur.sel==cur.sol[i]){cur.p[i]=cur.sel;snd('ok');rsd();if(cur.p.every(v=>v)){cur.lock=1;setTimeout(()=>dn(star(cur.mis)),600)}}
+else{cur.mis++;snd('no');say('Chưa đúng, em thử hình khác nhé!');document.getElementById('c'+i).classList.add('sh')}}
+const CH={ang:'Em hãy tìm 5 đồ vật xung quanh nhà và đếm xem mỗi đồ vật có mấy góc vuông nhé!',t:'Em hãy xếp các mảnh ghép thành một đồ vật hoặc con vật em thích, rồi vẽ lại lên giấy nhé!',t2:'Em hãy xếp một ngôi nhà hoặc cối xay gió bằng các mảnh ghép, rồi vẽ lại lên giấy nhé!',tan:'Em hãy nhìn xem gạch lát sàn nhà em có hình gì. Rồi thử thiết kế một mẫu gạch của riêng em nhé!',tan2:'Em hãy thử xếp tangram thành cái ghế, cái đèn, con thỏ hay con mèo nhé!',sdk:'Em hãy tự vẽ một bảng Sudoku rồi mời ba mẹ hoặc bạn bè cùng chơi nhé!'};
+const tbar=(t,f)=>`<div class="row"><button class="btn" style="background:#78909c" aria-label="Quay lại" onclick="lv(${cur.i})">⬅️</button><b style="font-size:26px">${t}</b><button class="btn" style="background:#26a69a" aria-label="Nghe lại" onclick="say(IN)">🔊</button></div>`;
+function chl(i){cur={i,g:G[i]};IN=CH[G[i].id]+' Sau đó, em hãy kể lại bài học hôm nay cho người thân nghe nhé!';view(tbar('🏠 Thử thách')+MK(120)+`<p class="say" style="font-size:24px">${IN}</p><button class="btn" style="background:#43a047;font-size:28px" onclick="bonus('c${G[i].id}')">✅ Em làm xong rồi!</button>`);say(IN)}
+function bonus(k){if(S.ch[k]){say('Em đã làm rồi, giỏi lắm!');return}S.ch[k]=1;const nb=BD.filter(b=>!S.bd.includes(b[0])&&b[3]());nb.forEach(b=>S.bd.push(b[0]));save();snd('win');confetti();say('Giỏi quá! Em được thêm một sao.'+(nb.length?' Em nhận huy hiệu '+nb[0][2]+'!':''));setTimeout(()=>lv(cur.i),2600)}
+function ev(i){cur={i,g:G[i],ck:[0,0,0],c:'#e53935'};IN='Hãy vẽ những gì em đã học được. Rồi chạm vào các dòng bên dưới nếu em làm được nhé.';const T=['Em hiểu bài học hôm nay.','Em nhớ những điều đã học.','Em biết dùng bài học vào cuộc sống.'];
+view(tbar('📝 Đánh giá')+`<p class="say">🎨 Em hãy vẽ những gì em đã học được!</p><canvas id="cv" width="600" height="320" style="width:100%;background:#fff;border-radius:22px;touch-action:none"></canvas><div>${['#e53935','#fb8c00','#fdd835','#43a047','#1e88e5','#3b2f63'].map(c=>`<button class="btn" style="background:${c};padding:14px" aria-label="Màu" onclick="cur.c='${c}';snd('pop')"></button>`).join('')}<button class="btn" style="background:#78909c" aria-label="Xóa" onclick="document.getElementById('cv').getContext('2d').clearRect(0,0,600,320)">🧽</button></div>${T.map((t,k)=>`<div class="card" id="k${k}" style="background:#26b5c9;margin:8px 0;display:flex;justify-content:space-between;font-size:20px" onclick="ck(${k})"><span onclick="event.stopPropagation();say('${t}')">🔊 ${t}</span><span>⬜</span></div>`).join('')}<button class="btn" style="background:#43a047;font-size:28px" onclick="bonus('e${G[i].id}')">⭐ Xong rồi!</button>`);
+const c=document.getElementById('cv'),x=c.getContext('2d');let d=0;x.lineWidth=8;x.lineCap='round';x.lineJoin='round';const pt=e=>{const r=c.getBoundingClientRect();return[(e.clientX-r.left)*600/r.width,(e.clientY-r.top)*320/r.height]};
+c.onpointerdown=e=>{d=1;c.setPointerCapture(e.pointerId);x.strokeStyle=cur.c;x.beginPath();x.moveTo(...pt(e))};c.onpointermove=e=>{if(d){x.lineTo(...pt(e));x.stroke()}};c.onpointerup=()=>d=0;say(IN)}
+function ck(k){cur.ck[k]^=1;snd('pop');document.querySelector('#k'+k+' span:last-child').textContent=cur.ck[k]?'✅':'⬜'}
+splash();
+</script></body></html>
